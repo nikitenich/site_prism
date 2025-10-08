@@ -53,4 +53,7 @@ module SitePrism
 
   # The version of the target gem is unsupported, so using that feature is not possible
   class UnsupportedGemVersionError < SitePrismError; end
+
+  # The element or section was not defined
+  class ElementOrSectionNotDefinedError < SitePrismError; end
 end

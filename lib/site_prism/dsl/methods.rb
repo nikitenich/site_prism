@@ -92,6 +92,36 @@ module SitePrism
         end
       end
 
+      def element_before_action(name, &block)
+        raise_if_element_or_section_not_defined(name)
+        raise MissingBlockError unless block
+
+        element_methods_to_prepend = %w[%s has_%s? has_no_%s?].map { |method| method % name.to_s }.map(&:to_sym)
+        method_syms_with_methods = element_methods_to_prepend.zip(element_methods_to_prepend.map(&method(:instance_method)))
+        Module.new do
+          method_syms_with_methods.each do |method_sym, element_method|
+            define_method(method_sym) do |*args, **kwargs|
+              element_method
+                .bind(self)
+                .tap { |bound_method| instance_exec(bound_method, *args, **kwargs, &block) }
+                .call(*args, **kwargs)
+            end
+          end
+        end.then(&method(:prepend))
+      end
+
+      def element_post_action(name, &block)
+        raise_if_element_or_section_not_defined(name)
+        raise MissingBlockError unless block
+
+        element_method = instance_method(name)
+        Module.new do
+          define_method(name) do
+            instance_exec(element_method.bind(self).call, &block)
+          end
+        end.then(&method(:prepend))
+      end
+
       private
 
       def raise_if_build_time_block_supplied(parent_object, name, has_block, type)
@@ -100,6 +130,13 @@ module SitePrism
         SitePrism.logger.debug("Type passed in: #{type}")
         SitePrism.logger.error("#{name} has been defined as a '#{type}' item in #{parent_object}. It does not accept build-time blocks.")
         raise SitePrism::UnsupportedBlockError
+      end
+
+      def raise_if_element_or_section_not_defined(name)
+        return if defined?(name)
+
+        SitePrism.logger.error("Element or section #{name} is not defined in #{self.class}")
+        raise ElementOrSectionNotDefinedError
       end
 
       def deduce_iframe_element_find_args(args)
