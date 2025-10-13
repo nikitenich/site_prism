@@ -40,4 +40,8 @@ class TestSite
   def vanishing
     @vanishing ||= Vanishing.new
   end
+
+  def appearing
+    @appearing ||= Appearing.new
+  end
 end
