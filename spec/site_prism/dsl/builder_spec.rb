@@ -21,6 +21,18 @@ describe SitePrism::DSL::Builder do
       element :attributes, '.foo'
     end
   end
+  let(:before_hook_without_block) do
+    Class.new(SitePrism::Page) do
+      element :foo, '.foo'
+      element_before_hook(:foo)
+    end
+  end
+  let(:after_hook_without_block) do
+    Class.new(SitePrism::Page) do
+      element :foo, '.foo'
+      element_after_hook(:foo)
+    end
+  end
 
   it 'does not build pages with invalid DSL prefixes' do
     expect { invalid_dsl_prefix }.to raise_error(SitePrism::InvalidDSLNameError)
@@ -36,5 +48,13 @@ describe SitePrism::DSL::Builder do
 
   it 'does not build pages with blacklisted DSL names' do
     expect { blacklisted_name }.to raise_error(SitePrism::InvalidDSLNameError)
+  end
+
+  it 'does not allow before hooks without block' do
+    expect { before_hook_without_block }.to raise_error(SitePrism::MissingBlockError)
+  end
+
+  it 'does not allow after hooks without block' do
+    expect { after_hook_without_block }.to raise_error(SitePrism::MissingBlockError)
   end
 end
