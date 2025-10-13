@@ -97,30 +97,34 @@ module SitePrism
         raise MissingBlockError unless block
 
         element_methods_to_prepend = %w[%s has_%s? has_no_%s?].map { |method| method % name.to_s }.map(&:to_sym)
-        method_syms_with_methods = element_methods_to_prepend.zip(element_methods_to_prepend.map(&method(:instance_method)))
-        Module.new do
-          method_syms_with_methods.each do |method_sym, element_method|
-            define_method(method_sym) do |*args, **kwargs|
+        method_symbols_with_methods = element_methods_to_prepend.zip(element_methods_to_prepend.map(&method(:instance_method)))
+        prepend(Module.new do
+          method_symbols_with_methods.each do |method_symbol, element_method|
+            define_method(method_symbol) do |*args, **kwargs|
               element_method
                 .bind(self)
                 .tap { |bound_method| instance_exec(bound_method, *args, **kwargs, &block) }
                 .call(*args, **kwargs)
             end
           end
-        end.then(&method(:prepend))
+        end)
       end
+
+      alias section_before_action element_before_action
 
       def element_post_action(name, &block)
         raise_if_element_or_section_not_defined(name)
         raise MissingBlockError unless block
 
         element_method = instance_method(name)
-        Module.new do
-          define_method(name) do
-            instance_exec(element_method.bind(self).call, &block)
+        prepend(Module.new do
+          define_method(name) do |*args, **kwargs|
+            instance_exec(element_method.bind_call(self, *args, **kwargs), &block)
           end
-        end.then(&method(:prepend))
+        end)
       end
+
+      alias section_post_action element_post_action
 
       private
 
