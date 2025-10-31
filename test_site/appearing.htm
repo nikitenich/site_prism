@@ -3,11 +3,11 @@
     <script type="text/javascript">
         setHover = function () {
             document.getElementById("container").onmouseover = function () {
-                document.getElementById("will_become_visible").style.display = 'block'
+                document.getElementById("willBecomeVisible").style.display = 'block'
             }
 
             document.getElementById("container").onmouseout = function () {
-                document.getElementById("will_become_visible").style.display = 'none'
+                document.getElementById("willBecomeVisible").style.display = 'none'
             }
         }
     </script>
@@ -16,7 +16,7 @@
 <body onload="setHover()">
 <h1>Appearing Page!</h1>
 <div id="container" style="display: block;">
-    <span id="will_become_visible" style="display: none">Text that only visible after hovering container</span>
+    <span id="willBecomeVisible" style="display: none">Text that only visible after hovering container</span>
     <span id="alwaysVisibleText">Always visible text</span>
 </div>
 </body>

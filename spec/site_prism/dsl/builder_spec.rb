@@ -24,13 +24,13 @@ describe SitePrism::DSL::Builder do
   let(:before_hook_without_block) do
     Class.new(SitePrism::Page) do
       element :foo, '.foo'
-      element_before_hook(:foo)
+      before_hook(:foo)
     end
   end
   let(:after_hook_without_block) do
     Class.new(SitePrism::Page) do
       element :foo, '.foo'
-      element_after_hook(:foo)
+      after_hook(:foo)
     end
   end
 

@@ -92,7 +92,7 @@ module SitePrism
         end
       end
 
-      def element_before_hook(name, &block)
+      def before_hook(name, &block)
         raise_if_element_or_section_not_defined(name)
         raise MissingBlockError unless block
 
@@ -110,9 +110,9 @@ module SitePrism
         end)
       end
 
-      alias section_before_hook element_before_hook
+      alias section_before_hook before_hook
 
-      def element_after_hook(name, &block)
+      def after_hook(name, &block)
         raise_if_element_or_section_not_defined(name)
         raise MissingBlockError unless block
 
@@ -123,8 +123,6 @@ module SitePrism
           end
         end)
       end
-
-      alias section_after_hook element_after_hook
 
       private
 
